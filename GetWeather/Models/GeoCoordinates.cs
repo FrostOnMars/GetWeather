@@ -10,11 +10,11 @@ namespace GetWeather.Models;
 
 public class GeoCoordinates
 {
-    [JsonProperty("Property1")]
-    public Class1[]? Property1 { get; set; }
+    [JsonProperty("GeoData")]
+    public GeoDatum[]? GeoData { get; set; }
 }
 
-public class Class1
+public class GeoDatum
 {
     [JsonProperty("Name")]
     public string? Name { get; set; }
