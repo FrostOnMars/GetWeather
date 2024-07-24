@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GetWeather.Models
+namespace GetWeather.Models;
+
+public class SampleData
 {
-    public class SampleData
-    {
-        public const string SampleData1 = @"                
+    public const string SampleData1 = @"                
 {
    ""lat"":33.44,
    ""lon"":-94.04,
@@ -131,5 +131,4 @@ namespace GetWeather.Models
   }
                 
               ";
-    }
 }
