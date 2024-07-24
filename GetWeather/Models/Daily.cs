@@ -51,7 +51,7 @@ public class Daily
     public float WindGust { get; set; }
 
     [JsonProperty("weather"), CanBeNull]
-    public Weather2[] Weather { get; set; }
+    public Weather[] Weather { get; set; }
 
     [JsonProperty("clouds")]
     public int Clouds { get; set; }

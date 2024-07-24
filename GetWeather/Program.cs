@@ -9,7 +9,7 @@ using GetWeather.Models;
 
 var locationParameterModel = new LocationParameterModel();
 var geoData = OpenWeatherController.GetGeoCoordinates("London", out locationParameterModel);
-OpenWeatherController.GetWeatherData(locationParameterModel);
+var weatherData = OpenWeatherController.GetWeatherData(locationParameterModel);
 
 
 //1. fetch data, 2. model data, 3. store into SQL
@@ -28,8 +28,32 @@ public class AppConfig
     public string WeatherUrl { get; set; } = "https://api.openweathermap.org/data/2.5/weather";
     public string Lat { get; set; } = "33.35";
     public string Lon { get; set; } = "97.69";
-    public string GeocodingUrlParameters => GetGeocodingUrlParameters();
-    public string WeatherUrlParameters => GetWeatherUrlParameters();
+    public string GeocodingUrlParameters { get; set; }
+    private LocationParameterModel _locationParameter { get; set; }
+
+    public LocationParameterModel LocationParameter
+    {
+        get => _locationParameter;
+        set
+        {
+            _locationParameter = value;
+            Lat = value.Lat;
+            Lon = value.Lon;
+            WeatherUrlParameters = GetWeatherUrlParameters();
+        }
+    }
+
+    private string _city;
+    public string City
+    {
+        get => _city;
+        set
+        {
+            _city = value;
+            GeocodingUrlParameters = GetGeocodingUrlParameters(value);
+        }
+    }
+    public string WeatherUrlParameters { get; set; }
     public string FullGeocodingUrl => $"{GeocodingUrl}?{GeocodingUrlParameters}";
     public string FullWeatherUrl => $"{WeatherUrl}?{WeatherUrlParameters}";
     public NpgsqlConnection Connection { get; set; } = new NpgsqlConnection("Host=localhost;Username=postgres;Password=password;Database=OpenWeather");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GetWeather.Controllers;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -12,6 +13,7 @@ public class GeoCoordinates
 {
     [JsonProperty("GeoData")]
     public GeoDatum[]? GeoData { get; set; }
+    
 }
 
 public class GeoDatum

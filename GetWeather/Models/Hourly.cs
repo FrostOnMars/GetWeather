@@ -42,7 +42,7 @@ public class Hourly
     public float WindGust { get; set; }
 
     [JsonProperty("weather"), CanBeNull]
-    public Weather1[] Weather { get; set; }
+    public Weather[] Weather { get; set; }
 
     [JsonProperty("pop")]
     public float Pop { get; set; }

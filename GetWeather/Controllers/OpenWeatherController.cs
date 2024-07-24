@@ -15,6 +15,7 @@ public static class OpenWeatherController
     //call the class and get its data
     public static GeoCoordinates GetGeoCoordinates(string city, out LocationParameterModel locationParameterModel)
     {
+        AppConfig.Instance.City = city;
         locationParameterModel = new LocationParameterModel();
         locationParameterModel.City = city;
         var client = new RestClient(AppConfig.Instance.FullGeocodingUrl);
@@ -31,23 +32,40 @@ public static class OpenWeatherController
         //{
         //    Console.WriteLine("Error: " + response.ErrorMessage);
         //}
-        var geoCoordinates = JsonConvert.DeserializeObject<GeoCoordinates>(response.Content ?? string.Empty);
+        var geoCoordinates = JsonConvert.DeserializeObject<List<GeoDatum>>(response.Content ?? string.Empty);
         
-        if (geoCoordinates?.GeoData is null || geoCoordinates.GeoData?.Length == 0)
+        if (geoCoordinates is null || geoCoordinates.Count == 0)
         {
             throw new Exception("No data found");
         }
 
-        locationParameterModel.Lat = geoCoordinates.GeoData[0].Lat.ToString(CultureInfo.CurrentCulture);
-        locationParameterModel.Lon = geoCoordinates.GeoData[0].Lon.ToString(CultureInfo.CurrentCulture);
-        locationParameterModel.Country = geoCoordinates.GeoData[0].Country ?? string.Empty;
-        locationParameterModel.State = geoCoordinates.GeoData[0].State ?? string.Empty;
+        locationParameterModel.Lat = geoCoordinates[0].Lat.ToString(CultureInfo.CurrentCulture);
+        locationParameterModel.Lon = geoCoordinates[0].Lon.ToString(CultureInfo.CurrentCulture);
+        locationParameterModel.Country = geoCoordinates[0].Country ?? string.Empty;
+        locationParameterModel.State = geoCoordinates[0].State ?? string.Empty;
         
-        return geoCoordinates;
+        return new GeoCoordinates
+        {
+            GeoData = geoCoordinates.ToArray()
+        };
     }
 
-    public static void GetWeatherData(LocationParameterModel location)
+    public static CurrentWeather GetWeatherData(LocationParameterModel location)
     {
+        AppConfig.Instance.LocationParameter = location;
+        var client = new RestClient(AppConfig.Instance.FullWeatherUrl);
+        var request = new RestRequest(AppConfig.Instance.FullWeatherUrl, Method.Get);
 
+        _ = request.AddHeader("Content-Type", "application/json");
+        var response = client.Execute(request);
+
+        var weather = JsonConvert.DeserializeObject<CurrentWeather>(response.Content ?? string.Empty);
+
+        if (weather?.weather is null || weather.weather?.Count == 0)
+        {
+            throw new Exception("No data found");
+        }
+        
+        return weather;
     }
 }
