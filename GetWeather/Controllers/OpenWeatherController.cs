@@ -61,7 +61,7 @@ public static class OpenWeatherController
 
         var weather = JsonConvert.DeserializeObject<CurrentWeather>(response.Content ?? string.Empty);
 
-        if (weather?.weather is null || weather.weather?.Count == 0)
+        if (weather?.Weather is null || weather.Weather?.Count == 0)
         {
             throw new Exception("No data found");
         }

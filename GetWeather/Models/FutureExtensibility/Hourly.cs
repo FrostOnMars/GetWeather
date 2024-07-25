@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace GetWeather.Models;
+namespace GetWeather.Models.FutureExtensibility;
 
 public class Hourly
 {

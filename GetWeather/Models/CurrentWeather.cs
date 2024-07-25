@@ -4,73 +4,131 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GetWeather.Models.FutureExtensibility;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace GetWeather.Models
+namespace GetWeather.Models;
+
+public class CurrentWeather
 {
-    
+    [JsonProperty("coord"), CanBeNull]
+    public Coord Coord { get; set; }
 
-    public class CurrentWeather
-    {
-        public Coord coord { get; set; }
-        public List<Weather> weather { get; set; }
-        public string _base { get; set; }
-        public Main main { get; set; }
-        public int visibility { get; set; }
-        public Wind wind { get; set; }
-        public Rain rain { get; set; }
-        public Clouds clouds { get; set; }
-        public int dt { get; set; }
-        public Sys sys { get; set; }
-        public int timezone { get; set; }
-        public int id { get; set; }
-        public string name { get; set; }
-        public int cod { get; set; }
-    }
+    [JsonProperty("weather"), CanBeNull]
+    public List<Weather> Weather { get; set; }
 
-    public class Coord
-    {
-        public float lon { get; set; }
-        public float lat { get; set; }
-    }
+    [JsonProperty("base"), CanBeNull]
+    public string Base { get; set; }
 
-    public class Main
-    {
-        public float temp { get; set; }
-        public float feels_like { get; set; }
-        public float temp_min { get; set; }
-        public float temp_max { get; set; }
-        public int pressure { get; set; }
-        public int humidity { get; set; }
-        public int sea_level { get; set; }
-        public int grnd_level { get; set; }
-    }
+    [JsonProperty("main"), CanBeNull]
+    public Main Main { get; set; }
 
-    public class Wind
-    {
-        public float speed { get; set; }
-        public int deg { get; set; }
-        public float gust { get; set; }
-    }
+    [JsonProperty("visibility")]
+    public int Visibility { get; set; }
 
-    public class Rain
-    {
-        public float _1h { get; set; }
-    }
+    [JsonProperty("wind"), CanBeNull]
+    public Wind Wind { get; set; }
 
-    public class Clouds
-    {
-        public int all { get; set; }
-    }
+    [JsonProperty("rain"), CanBeNull]
+    public Rain Rain { get; set; }
 
-    public class Sys
-    {
-        public int type { get; set; }
-        public int id { get; set; }
-        public string country { get; set; }
-        public int sunrise { get; set; }
-        public int sunset { get; set; }
-    }
+    [JsonProperty("clouds"), CanBeNull]
+    public Clouds Clouds { get; set; }
 
+    [JsonProperty("dt")]
+    public int Dt { get; set; }
 
+    [JsonProperty("sys"), CanBeNull]
+    public Sys Sys { get; set; }
+
+    [JsonProperty("timezone")]
+    public int Timezone { get; set; }
+
+    [JsonProperty("id")]
+    public int Id { get; set; }
+
+    [JsonProperty("name"), CanBeNull]
+    public string Name { get; set; }
+
+    [JsonProperty("cod")]
+    public int Cod { get; set; }
+}
+
+public class Coord
+{
+    [JsonProperty("lon")]
+    public float Lon { get; set; }
+
+    [JsonProperty("lat")]
+    public float Lat { get; set; }
+}
+
+public class Main
+{
+    [JsonProperty("temp")]
+    public float Temp { get; set; }
+
+    [JsonProperty("feels_like")]
+    public float FeelsLike { get; set; }
+
+    [JsonProperty("temp_min")]
+    public float TempMin { get; set; }
+
+    [JsonProperty("temp_max")]
+    public float TempMax { get; set; }
+
+    [JsonProperty("pressure")]
+    public int Pressure { get; set; }
+
+    [JsonProperty("humidity")]
+    public int Humidity { get; set; }
+
+    [JsonProperty("sea_level")]
+    public int SeaLevel { get; set; }
+
+    [JsonProperty("grnd_level")]
+    public int GrndLevel { get; set; }
+}
+
+public class Wind
+{
+    [JsonProperty("speed")]
+    public float Speed { get; set; }
+
+    [JsonProperty("deg")]
+    public int Deg { get; set; }
+
+    [JsonProperty("gust")]
+    public float Gust { get; set; }
+}
+
+public class Rain
+{
+    [JsonProperty("1h")]
+    public float OneHour { get; set; }
+}
+
+public class Clouds
+{
+    [JsonProperty("all")]
+    public int All { get; set; }
+}
+
+public class Sys
+{
+    [JsonProperty("type")]
+    public int Type { get; set; }
+
+    [JsonProperty("id")]
+    public int Id { get; set; }
+
+    [JsonProperty("country"), CanBeNull]
+    public string Country { get; set; }
+
+    [JsonProperty("sunrise")]
+    public int Sunrise { get; set; }
+
+    [JsonProperty("sunset")]
+    public int Sunset { get; set; }
 }

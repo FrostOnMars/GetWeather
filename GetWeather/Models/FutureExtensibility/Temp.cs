@@ -1,11 +1,17 @@
 ﻿using Newtonsoft.Json;
 
-namespace GetWeather.Models;
+namespace GetWeather.Models.FutureExtensibility;
 
-public class FeelsLike
+public class Temp
 {
     [JsonProperty("day")]
     public float Day { get; set; }
+
+    [JsonProperty("min")]
+    public float Min { get; set; }
+
+    [JsonProperty("max")]
+    public float Max { get; set; }
 
     [JsonProperty("night")]
     public float Night { get; set; }
