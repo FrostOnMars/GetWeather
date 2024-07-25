@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace GetWeather.Models;
 
-public class GeoCoordinates
+public class GeoCoordinates : IGeoCoordinates
 {
     [JsonProperty("GeoData")]
     public GeoDatum[]? GeoData { get; set; }
