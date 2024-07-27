@@ -4,85 +4,97 @@ using RestSharp;
 using System.Globalization;
 
 namespace GetWeather.Controllers;
-
 public static class OpenWeatherController
 {
     #region Public Methods
 
-    public static GeoCoordinates GetGeoCoordinates(string city, string fullUrl,
-        out LocationParameterModel locationParameterModel)
+    public static GeoCoordinates GetGeoCoordinates(string city, string fullUrl, out LocationParameterModel locationParameterModel)
     {
-        //OpenClientRequest(); Question for Jon: can I use the same method to open both client requests using different urls?
-        //GetGeoService();
-        //AssignGeoCoordinates();
+        locationParameterModel = InitializeLocationParameterModel(city);
+        var responseContent = ExecuteRequest(fullUrl);
 
-        locationParameterModel = new LocationParameterModel();
-        locationParameterModel.City = city;
-        var client = new RestClient(fullUrl);
-        var request = new RestRequest(fullUrl);
+        return DeserializeGeoCoordinates(responseContent, locationParameterModel);
+    }
 
-        _ = request.AddHeader("Content-Type", "application/json");
+    public static CurrentWeather GetWeatherData(LocationParameterModel location, string fullUrl)
+    {
+        var responseContent = ExecuteRequest(fullUrl);
+
+        return DeserializeWeatherData(responseContent);
+    }
+
+    #endregion Public Methods
+
+    #region Private Methods
+
+    private static LocationParameterModel InitializeLocationParameterModel(string city)
+    {
+        return new LocationParameterModel { City = city };
+    }
+
+    private static string ExecuteRequest(string url)
+    {
+        var client = new RestClient(url);
+        var request = new RestRequest(url);
+        request.AddHeader("Content-Type", "application/json");
         var response = client.Execute(request);
 
+        return response.Content ?? string.Empty;
+    }
+
+    private static GeoCoordinates DeserializeGeoCoordinates(string responseContent, LocationParameterModel locationParameterModel)
+    {
         var geoDatumType = typeof(GeoDatum);
         var geoDataType = geoDatumType.MakeArrayType();
 
         try
         {
-            //Handles the case where the API returns an array of objects
-            var geoCoordinates =
-                JsonConvert.DeserializeObject(response.Content ?? string.Empty, geoDataType) as List<GeoDatum>;
-
-            if (geoCoordinates is null || geoCoordinates.Count == 0) throw new Exception("No data found");
-
-            locationParameterModel.Lat = geoCoordinates[0].Lat.ToString(CultureInfo.CurrentCulture);
-            locationParameterModel.Lon = geoCoordinates[0].Lon.ToString(CultureInfo.CurrentCulture);
-            locationParameterModel.Country = geoCoordinates[0].Country ?? string.Empty;
-            locationParameterModel.State = geoCoordinates[0].State ?? string.Empty;
-
-            return new GeoCoordinates
+            var geoCoordinatesList = JsonConvert.DeserializeObject(responseContent, geoDataType) as List<GeoDatum>;
+            if (geoCoordinatesList != null && geoCoordinatesList.Count > 0)
             {
-                GeoData = geoCoordinates.ToArray()
-            };
+                return AssignGeoCoordinates(geoCoordinatesList, locationParameterModel);
+            }
+
+            throw new Exception("No data found");
         }
-        catch (Exception e)
+        catch
         {
-            //Handles the case where the API returns a single object instead of an array
-            var geoCoordinates =
-                JsonConvert.DeserializeObject(response.Content ?? string.Empty, geoDatumType) as GeoDatum;
-
-            if (geoCoordinates is null) throw new Exception("No data found");
-
-            locationParameterModel.Lat = geoCoordinates.Lat.ToString(CultureInfo.CurrentCulture);
-            locationParameterModel.Lon = geoCoordinates.Lon.ToString(CultureInfo.CurrentCulture);
-            locationParameterModel.Country = geoCoordinates.Country ?? string.Empty;
-            locationParameterModel.State = geoCoordinates.State ?? string.Empty;
-
-            return new GeoCoordinates
+            var geoCoordinatesSingle = JsonConvert.DeserializeObject(responseContent, geoDatumType) as GeoDatum;
+            if (geoCoordinatesSingle != null)
             {
-                GeoData = new[] { geoCoordinates }
-            };
+                return AssignGeoCoordinates(new List<GeoDatum> { geoCoordinatesSingle }, locationParameterModel);
+            }
+
+            throw new Exception("No data found");
         }
     }
 
-    public static CurrentWeather GetWeatherData(LocationParameterModel location, string FullUrl)
+    private static GeoCoordinates AssignGeoCoordinates(List<GeoDatum> geoCoordinates, LocationParameterModel locationParameterModel)
     {
-        //OpenClientRequest();
-        //GetWeatherService();
-        //AssignWeatherData();
+        var firstGeoDatum = geoCoordinates.First();
 
-        var client = new RestClient(FullUrl);
-        var request = new RestRequest(FullUrl);
+        locationParameterModel.Lat = firstGeoDatum.Lat.ToString(CultureInfo.CurrentCulture);
+        locationParameterModel.Lon = firstGeoDatum.Lon.ToString(CultureInfo.CurrentCulture);
+        locationParameterModel.Country = firstGeoDatum.Country ?? string.Empty;
+        locationParameterModel.State = firstGeoDatum.State ?? string.Empty;
 
-        _ = request.AddHeader("Content-Type", "application/json");
-        var response = client.Execute(request);
+        return new GeoCoordinates
+        {
+            GeoData = geoCoordinates.ToArray()
+        };
+    }
 
-        var weather = JsonConvert.DeserializeObject<CurrentWeather>(response.Content ?? string.Empty);
+    private static CurrentWeather DeserializeWeatherData(string responseContent)
+    {
+        var weather = JsonConvert.DeserializeObject<CurrentWeather>(responseContent);
 
-        if (weather?.Weather is null || weather.Weather?.Count == 0) throw new Exception("No data found");
+        if (weather?.Weather == null || weather.Weather.Count == 0)
+        {
+            throw new Exception("No data found");
+        }
 
         return weather;
     }
 
-    #endregion Public Methods
+    #endregion Private Methods
 }
