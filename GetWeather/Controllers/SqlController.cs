@@ -7,18 +7,18 @@ namespace GetWeather.Controllers;
 public class SqlController
 {
 
-    private static readonly NpgsqlConnection _connectionString = AppConfig.ConnectionString;
+    private static readonly string _connectionString = AppConfig.ConnectionString;
 
 
     #region Public Methods
 
     public static void InsertCurrentWeatherToDb(CurrentWeather weather)
     {
-        //using var connection = CreateConnection();
-        using var connection = _connectionString;
-        connection.Open();
+        using var connection = CreateConnection();
+        //using var connection = _connectionString;
         using var command = CreateInsertWeatherCommand(weather, connection);
-        
+        connection.Open();
+
         command.ExecuteNonQuery();
     }
 
@@ -26,8 +26,8 @@ public class SqlController
     {
         var cities = new List<LocationParameterModel>();
 
-        //using var connection = CreateConnection();
-        using var connection = _connectionString;
+        using var connection = CreateConnection();
+        //using var connection = _connectionString;
         using var command = CreateGetAllCitiesCommand(connection);
         connection.Open();
         using var reader = command.ExecuteReader();
@@ -44,10 +44,10 @@ public class SqlController
 
     #region Private Methods
 
-    //private static NpgsqlConnection CreateConnection()
-    //{
-    //    return new NpgsqlConnection(_connectionString);
-    //}
+    private static NpgsqlConnection CreateConnection()
+    {
+        return new NpgsqlConnection(_connectionString);
+    }
 
     public static NpgsqlCommand CreateInsertWeatherCommand(CurrentWeather weather, NpgsqlConnection connection)
     {

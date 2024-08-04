@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using RestSharp;
 using System.Globalization;
+using GetWeather.Utilities;
 
 namespace GetWeather.Controllers;
 public static class OpenWeatherController
@@ -49,23 +50,43 @@ public static class OpenWeatherController
 
         try
         {
-            var geoCoordinatesList = JsonConvert.DeserializeObject(responseContent, geoDataType) as List<GeoDatum>;
+            List<GeoDatum> geoCoordinatesList = [];
+            if (JsonHelper.IsJsonArray(responseContent))
+            {
+                geoCoordinatesList = JsonConvert.DeserializeObject(responseContent, geoDataType) as List<GeoDatum>;
+            }
+            else if (JsonHelper.IsJsonObject(responseContent))
+            {
+                geoCoordinatesList.Add(JsonConvert.DeserializeObject<GeoDatum>(responseContent));
+            }
+            else             
+                throw new Exception("No data found");
+
             if (geoCoordinatesList != null && geoCoordinatesList.Count > 0)
             {
                 return AssignGeoCoordinates(geoCoordinatesList, locationParameterModel);
-            }
+            } 
+            else
+                throw new Exception("No data found");
 
-            throw new Exception("No data found");
+            //var geoCoordinatesList = JsonConvert.DeserializeObject(responseContent, geoDataType) as List<GeoDatum>;
+            //if (geoCoordinatesList != null && geoCoordinatesList.Count > 0)
+            //{
+            //    return AssignGeoCoordinates(geoCoordinatesList, locationParameterModel);
+            //}
+
+            //throw new Exception("No data found");
         }
         catch
         {
-            var geoCoordinatesSingle = JsonConvert.DeserializeObject(responseContent, geoDatumType) as GeoDatum;
-            if (geoCoordinatesSingle != null)
-            {
-                return AssignGeoCoordinates(new List<GeoDatum> { geoCoordinatesSingle }, locationParameterModel);
-            }
+            //var geoCoordinatesSingle = JsonConvert.DeserializeObject(responseContent, geoDatumType) as GeoDatum;
+            //if (geoCoordinatesSingle != null)
+            //{
+            //    return AssignGeoCoordinates(new List<GeoDatum> { geoCoordinatesSingle }, locationParameterModel);
+            //}
 
-            throw new Exception("No data found");
+            //throw new Exception("No data found");
+            return new GeoCoordinates();
         }
     }
 

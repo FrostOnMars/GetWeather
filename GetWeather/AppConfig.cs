@@ -23,7 +23,7 @@ public class AppConfig
 
     public string ApiKey { get; set; } = "e0322f2c8b62ca48ffa670e518c03a47";
 
-    public static NpgsqlConnection ConnectionString { get; set; } =
+    public static string ConnectionString { get; set; } =
         new("Host=localhost;Username=postgres;Password=password;Database=OpenWeather");
 
     #endregion Public Properties
