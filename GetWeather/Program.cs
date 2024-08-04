@@ -2,6 +2,7 @@
 
 using GetWeather.Controllers;
 using GetWeather.Models;
+using GetWeather.Models.FutureExtensibility;
 
 List<(GeoCoordinates, LocationParameterModel)> GeoDataTuples = [];
 List<CurrentWeather> WeatherData = [];
@@ -26,3 +27,6 @@ foreach (var (geoData, locationParameterModel) in GeoDataTuples)
     var weatherData = OpenWeatherController.GetWeatherData(locationParameterModel, urlController.FullUrl);
     WeatherData.Add(weatherData);
 }
+
+SqlController.InsertCurrentWeatherToDb(new CurrentWeather());
+
