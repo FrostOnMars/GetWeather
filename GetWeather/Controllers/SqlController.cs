@@ -1,4 +1,5 @@
 ﻿using GetWeather.Models;
+using GetWeather.Models.FutureExtensibility;
 using Npgsql;
 
 namespace GetWeather.Controllers;
@@ -83,22 +84,22 @@ public class SqlController
     public static NpgsqlCommand CreateInsertWeatherCommand(CurrentWeather weather, NpgsqlConnection connection)
     {
         var command = new NpgsqlCommand(
-            "CALL InsertCurrentWeatherToDb(@City, @Conditions, @WeatherDate, @Temperature, @Clouds, @Precipitation, @Rain, @Snow, @Windspeed, @WindDirection, @Visibility)",
+            "CALL insertweather(@city, @conditions, @weatherdate, @temperature, @feelslike, @clouds, @precipitation, @wind, @windspeed, @winddirection, @visibility)",
             connection);
 
-        command.Parameters.AddWithValue("City", weather.Name);
-        command.Parameters.AddWithValue("Conditions", weather.Weather?.FirstOrDefault()?.Description ?? string.Empty);
-        command.Parameters.AddWithValue("WeatherDate", ConvertToDateTime(weather.Dt));
-        command.Parameters.AddWithValue("Temperature", weather.Main?.Temp);
-        command.Parameters.AddWithValue("Clouds", weather.Clouds);
-        command.Parameters.AddWithValue("Precipitation", weather.Rain?.OneHour ?? (object)DBNull.Value);
-        command.Parameters.AddWithValue("Rain", weather.Rain);
-        command.Parameters.AddWithValue("Windspeed", weather.Wind?.Speed ?? (object)DBNull.Value);
-        command.Parameters.AddWithValue("WindDirection", weather.Wind?.Deg ?? (object)DBNull.Value);
-        command.Parameters.AddWithValue("Visibility", weather.Visibility);
+        command.Parameters.AddWithValue("city", weather.Name);
+        command.Parameters.AddWithValue("conditions", weather.Weather?.FirstOrDefault()?.Description ?? string.Empty);
+        command.Parameters.AddWithValue("weatherdate", ConvertToDateTime(weather.Dt));
+        command.Parameters.AddWithValue("temperature", weather.Main?.Temp);
+        command.Parameters.AddWithValue("feelslike", WeatherDescriber.DescribeFeelsLike(weather.Main.FeelsLike));
+        command.Parameters.AddWithValue("clouds", WeatherDescriber.ConvertCloudPercentToString(weather.Clouds));
+        command.Parameters.AddWithValue("precipitation", WeatherDescriber.AddPrecipitationText(weather.Rain) ?? string.Empty);
+        command.Parameters.AddWithValue("wind", WeatherDescriber.ConvertWindSpeedToBeaufortScale(weather.Wind));
+        command.Parameters.AddWithValue("windspeed", weather.Wind?.Speed ?? (object)DBNull.Value); //need method
+        command.Parameters.AddWithValue("winddirection", WeatherDescriber.ConvertDegreesToDirection((double)weather.Wind?.Deg)); //need method
+        command.Parameters.AddWithValue("visibility", weather.Visibility); //need method
 
         return command;
-
-        #endregion Private Methods
     }
+    #endregion Private Methods
 }
