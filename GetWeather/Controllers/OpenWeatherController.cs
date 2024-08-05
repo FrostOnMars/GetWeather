@@ -53,7 +53,7 @@ public static class OpenWeatherController
             List<GeoDatum> geoCoordinatesList = [];
             if (JsonHelper.IsJsonArray(responseContent))
             {
-                geoCoordinatesList = JsonConvert.DeserializeObject(responseContent, geoDataType) as List<GeoDatum>;
+                geoCoordinatesList = JsonConvert.DeserializeObject<List<GeoDatum>>(responseContent); 
             }
             else if (JsonHelper.IsJsonObject(responseContent))
             {

@@ -51,7 +51,7 @@ public class GeoDataUrlController : UrlController, IUrlAssembler
 
     #region Public Properties
 
-    public override string BaseUrl => "https://api.openweathermap.org/data/2.5/weather";
+    public override string BaseUrl => "http://api.openweathermap.org/geo/1.0/direct";
 
     public override string UrlParameters => AssembleUrlParameters(_city);
 

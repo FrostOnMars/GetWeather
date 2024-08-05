@@ -27,6 +27,8 @@ foreach (var (geoData, locationParameterModel) in GeoDataTuples)
     var weatherData = OpenWeatherController.GetWeatherData(locationParameterModel, urlController.FullUrl);
     WeatherData.Add(weatherData);
 }
-
-SqlController.InsertCurrentWeatherToDb(new CurrentWeather());
+foreach (var weather in WeatherData)
+{
+    SqlController.InsertCurrentWeatherToDb(weather);
+}
 
