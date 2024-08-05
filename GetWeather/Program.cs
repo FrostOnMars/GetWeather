@@ -3,7 +3,6 @@
 using GetWeather.Controllers;
 using GetWeather.Models;
 
-List<(GeoCoordinates, LocationParameterModel)> GeoDataTuples = [];
 List<CurrentWeather> WeatherData = [];
 List<UrlController> UrlControllerList = [];
 
@@ -14,17 +13,16 @@ foreach (var city in cities)
 {
     var urlController = new GeoDataUrlController(city);
     UrlControllerList.Add(urlController);
-    var locationParameterModel = new LocationParameterModel();
-    GeoDataTuples.Add((OpenWeatherController.GetGeoCoordinates(city, urlController.FullUrl, out locationParameterModel),
-        locationParameterModel));
+    OpenWeatherController.GetGeoCoordinates(city, urlController.FullUrl);
+    
 }
 
-foreach (var (geoData, locationParameterModel) in GeoDataTuples)
+foreach (var selectedCity in SelectedCities.Cities)
 {
+    var locationParameterModel = selectedCity.Parameter;
     var urlController = new WeatherUrlController(locationParameterModel);
     UrlControllerList.Add(urlController);
     var weatherData = OpenWeatherController.GetWeatherData(locationParameterModel, urlController.FullUrl);
     WeatherData.Add(weatherData);
 }
-
 foreach (var weather in WeatherData) SqlController.InsertCurrentWeatherToDb(weather);

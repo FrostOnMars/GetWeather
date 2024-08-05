@@ -30,6 +30,16 @@ public class GeoDatum
     #endregion Public Properties
 }
 
+public class SelectedCity
+{
+    public GeoDatum City { get; set; }
+    public LocationParameterModel Parameter { get; set; }
+}
+
+public static class SelectedCities
+{
+    public static List<SelectedCity> Cities { get; set; } = [];
+}
 public class Local_Names
 {
     #region Public Properties

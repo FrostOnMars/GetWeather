@@ -3,6 +3,7 @@ using GetWeather.Utilities;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace GetWeather.Controllers;
 
@@ -10,13 +11,10 @@ public static class OpenWeatherController
 {
     #region Public Methods
 
-    public static GeoCoordinates GetGeoCoordinates(string city, string fullUrl,
-        out LocationParameterModel locationParameterModel)
+    public static void GetGeoCoordinates(string city, string fullUrl)
     {
-        locationParameterModel = InitializeLocationParameterModel(city);
-        var responseContent = ExecuteRequest(fullUrl);
-
-        return DeserializeGeoCoordinates(responseContent, locationParameterModel);
+        var responseContent = ExecuteRequest(fullUrl); //returns a list of city names and data
+        DeserializeGeoCoordinates(responseContent);
     }
 
     public static CurrentWeather GetWeatherData(LocationParameterModel location, string fullUrl)
@@ -30,28 +28,26 @@ public static class OpenWeatherController
 
     #region Private Methods
 
-    private static GeoCoordinates AssignGeoCoordinates(List<GeoDatum> geoCoordinates,
-        LocationParameterModel locationParameterModel)
+    private static void AssignGeoCoordinates(List<GeoDatum> geoCoordinates)
     {
-        var firstGeoDatum = geoCoordinates.First();
-
-        locationParameterModel.Lat = firstGeoDatum.Lat.ToString(CultureInfo.CurrentCulture);
-        locationParameterModel.Lon = firstGeoDatum.Lon.ToString(CultureInfo.CurrentCulture);
-        locationParameterModel.Country = firstGeoDatum.Country ?? string.Empty;
-        locationParameterModel.State = firstGeoDatum.State ?? string.Empty;
-
-        return new GeoCoordinates
+        foreach (var selectedCity in geoCoordinates.Select(city => new SelectedCity
+                 {
+                     Parameter = new LocationParameterModel
+                     {
+                         Lat = city.Lat.ToString(CultureInfo.CurrentCulture),
+                         Lon = city.Lon.ToString(CultureInfo.CurrentCulture),
+                         Country = city.Country ?? string.Empty,
+                         State = city.State ?? string.Empty
+                     },
+                     City = city
+                 }))
         {
-            GeoData = geoCoordinates.ToArray()
-        };
+            SelectedCities.Cities.Add(selectedCity);
+        }
     }
 
-    private static GeoCoordinates DeserializeGeoCoordinates(string responseContent,
-        LocationParameterModel locationParameterModel)
+    private static void DeserializeGeoCoordinates(string responseContent)
     {
-        var geoDatumType = typeof(GeoDatum);
-        var geoDataType = geoDatumType.MakeArrayType();
-
         try
         {
             List<GeoDatum> geoCoordinatesList = [];
@@ -62,28 +58,12 @@ public static class OpenWeatherController
             else
                 throw new Exception("No data found");
 
-            if (geoCoordinatesList != null && geoCoordinatesList.Count > 0)
-                return AssignGeoCoordinates(geoCoordinatesList, locationParameterModel);
-            throw new Exception("No data found");
-
-            //var geoCoordinatesList = JsonConvert.DeserializeObject(responseContent, geoDataType) as List<GeoDatum>;
-            //if (geoCoordinatesList != null && geoCoordinatesList.Count > 0)
-            //{
-            //    return AssignGeoCoordinates(geoCoordinatesList, locationParameterModel);
-            //}
-
-            //throw new Exception("No data found");
+            if (geoCoordinatesList == null || geoCoordinatesList.Count <= 0) return;
+            AssignGeoCoordinates(geoCoordinatesList);
         }
         catch
         {
-            //var geoCoordinatesSingle = JsonConvert.DeserializeObject(responseContent, geoDatumType) as GeoDatum;
-            //if (geoCoordinatesSingle != null)
-            //{
-            //    return AssignGeoCoordinates(new List<GeoDatum> { geoCoordinatesSingle }, locationParameterModel);
-            //}
-
-            //throw new Exception("No data found");
-            return new GeoCoordinates();
+            //TODO: error handling 
         }
     }
 
@@ -104,11 +84,6 @@ public static class OpenWeatherController
         var response = client.Execute(request);
 
         return response.Content ?? string.Empty;
-    }
-
-    private static LocationParameterModel InitializeLocationParameterModel(string city)
-    {
-        return new LocationParameterModel { City = city };
     }
 
     #endregion Private Methods

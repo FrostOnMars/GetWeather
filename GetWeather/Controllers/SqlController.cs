@@ -91,7 +91,7 @@ public class SqlController
         command.Parameters.AddWithValue("@city", NpgsqlDbType.Varchar, weather.Name);
         command.Parameters.AddWithValue("@conditions", NpgsqlDbType.Text, weather.Weather?.FirstOrDefault()?.Description ?? string.Empty);
         command.Parameters.AddWithValue("@weatherdate", NpgsqlDbType.Timestamp, ConvertToDateTime(weather.Dt));
-        command.Parameters.AddWithValue("@temperature", NpgsqlDbType.Numeric, weather.Main?.Temp ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("@temperature", NpgsqlDbType.Numeric, WeatherDescriber.GetCurrentTemperatureByTimeOfDay((float)weather.Main?.Temp).Temperature); //TODO: how to add null value?
         command.Parameters.AddWithValue("@feelslike", NpgsqlDbType.Varchar, WeatherDescriber.DescribeFeelsLike(weather.Main.FeelsLike));
         command.Parameters.AddWithValue("@clouds", NpgsqlDbType.Varchar, WeatherDescriber.ConvertCloudPercentToString(weather.Clouds));
         command.Parameters.AddWithValue("@precipitation", NpgsqlDbType.Varchar, WeatherDescriber.AddPrecipitationText(weather.Rain) ?? string.Empty);

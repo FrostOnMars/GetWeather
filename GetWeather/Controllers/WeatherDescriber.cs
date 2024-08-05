@@ -145,7 +145,8 @@ public static class WeatherDescriber
             > 11 and <= 17 => "afternoon",
             _ => "evening"
         };
-        return (temperature, timeOfDay);
+
+        return (Math.Round(temperature), timeOfDay);
     }
 
     public static double Convert<T1, T2>(double value, T1 inputUnit, T2 outputUnit)
