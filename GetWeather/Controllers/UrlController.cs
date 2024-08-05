@@ -10,16 +10,7 @@ public interface IUrlAssembler
 
     #endregion Public Methods
 }
-public abstract class UrlController
-{
-    #region Public Properties
 
-    public virtual string BaseUrl { get; set; }
-    public virtual string FullUrl => $"{BaseUrl}?{UrlParameters}";
-    public virtual string UrlParameters { get; set; }
-
-    #endregion Public Properties
-}
 public class GeoDataUrlController : UrlController, IUrlAssembler
 {
     #region Private Fields
@@ -57,6 +48,18 @@ public class GeoDataUrlController : UrlController, IUrlAssembler
 
     #endregion Public Properties
 }
+
+public abstract class UrlController
+{
+    #region Public Properties
+
+    public virtual string BaseUrl { get; set; }
+    public virtual string FullUrl => $"{BaseUrl}?{UrlParameters}";
+    public virtual string UrlParameters { get; set; }
+
+    #endregion Public Properties
+}
+
 public class WeatherUrlController : UrlController, IUrlAssembler
 {
     #region Private Fields
@@ -92,6 +95,7 @@ public class WeatherUrlController : UrlController, IUrlAssembler
 
     #endregion Public Properties
 }
+
 public class DailyWeatherUrlController : UrlController, IUrlAssembler
 {
     //Template for future extensibility. To add this class, change the return statement and BaseUrl to match the new parameters.

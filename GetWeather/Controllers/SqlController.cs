@@ -1,14 +1,15 @@
 ﻿using GetWeather.Models;
 using Npgsql;
-using NpgsqlTypes;
 
 namespace GetWeather.Controllers;
 
 public class SqlController
 {
+    #region Private Fields
 
     private static readonly string _connectionString = AppConfig.ConnectionString;
 
+    #endregion Private Fields
 
     #region Public Methods
 
@@ -17,7 +18,6 @@ public class SqlController
         using var connection = CreateConnection();
         try
         {
-            
             //using var connection = _connectionString;
             using var command = CreateInsertWeatherCommand(weather, connection);
             connection.Open();
@@ -33,6 +33,7 @@ public class SqlController
             connection.Close();
         }
     }
+
     public List<LocationParameterModel> GetAllCities()
     {
         var cities = new List<LocationParameterModel>();
@@ -43,10 +44,7 @@ public class SqlController
         connection.Open();
         using var reader = command.ExecuteReader();
 
-        while (reader.Read())
-        {
-            cities.Add(MapReaderToLocationParameterModel(reader));
-        }
+        while (reader.Read()) cities.Add(MapReaderToLocationParameterModel(reader));
 
         return cities;
     }
@@ -60,35 +58,17 @@ public class SqlController
         return new NpgsqlConnection(_connectionString);
     }
 
-    public static NpgsqlCommand CreateInsertWeatherCommand(CurrentWeather weather, NpgsqlConnection connection)
+    private static DateTime ConvertToDateTime(int unixTime)
     {
-        var command = new NpgsqlCommand(
-            "CALL InsertCurrentWeatherToDb(@City, @Conditions, @WeatherDate, @Temperature, @Clouds, @Precipitation, @Rain, @Snow, @Windspeed, @WindDirection, @Visibility)",
-            connection);
-            
-        command.Parameters.AddWithValue("City", weather.Name);
-        command.Parameters.AddWithValue("Conditions", weather.Weather?.FirstOrDefault()?.Description ?? string.Empty);
-        command.Parameters.AddWithValue("WeatherDate", ConvertToDateTime(weather.Dt));
-        command.Parameters.AddWithValue("Temperature", weather.Main?.Temp);
-        command.Parameters.AddWithValue("Clouds", weather.Clouds);
-        command.Parameters.AddWithValue("Precipitation", weather.Rain?.OneHour ?? (object)DBNull.Value);
-        command.Parameters.AddWithValue("Rain", weather.Rain);
-        // command.Parameters.AddWithValue("Snow", weather.Snow ?? DBNull.Value);
-        command.Parameters.AddWithValue("Windspeed", weather.Wind?.Speed ?? (object)DBNull.Value);
-        command.Parameters.AddWithValue("WindDirection", weather.Wind?.Deg ?? (object)DBNull.Value);
-        command.Parameters.AddWithValue("Visibility", weather.Visibility);
-
-        return command;
-
-        #endregion Private Methods
-
+        return DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime;
     }
-    NpgsqlCommand CreateGetAllCitiesCommand(NpgsqlConnection connection)
+
+    private NpgsqlCommand CreateGetAllCitiesCommand(NpgsqlConnection connection)
     {
         return new NpgsqlCommand("SELECT * FROM GetAllCities()", connection);
     }
 
-    LocationParameterModel MapReaderToLocationParameterModel(NpgsqlDataReader reader)
+    private LocationParameterModel MapReaderToLocationParameterModel(NpgsqlDataReader reader)
     {
         return new LocationParameterModel
         {
@@ -100,8 +80,25 @@ public class SqlController
         };
     }
 
-    private static DateTime ConvertToDateTime(int unixTime)
+    public static NpgsqlCommand CreateInsertWeatherCommand(CurrentWeather weather, NpgsqlConnection connection)
     {
-        return DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime;
+        var command = new NpgsqlCommand(
+            "CALL InsertCurrentWeatherToDb(@City, @Conditions, @WeatherDate, @Temperature, @Clouds, @Precipitation, @Rain, @Snow, @Windspeed, @WindDirection, @Visibility)",
+            connection);
+
+        command.Parameters.AddWithValue("City", weather.Name);
+        command.Parameters.AddWithValue("Conditions", weather.Weather?.FirstOrDefault()?.Description ?? string.Empty);
+        command.Parameters.AddWithValue("WeatherDate", ConvertToDateTime(weather.Dt));
+        command.Parameters.AddWithValue("Temperature", weather.Main?.Temp);
+        command.Parameters.AddWithValue("Clouds", weather.Clouds);
+        command.Parameters.AddWithValue("Precipitation", weather.Rain?.OneHour ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("Rain", weather.Rain);
+        command.Parameters.AddWithValue("Windspeed", weather.Wind?.Speed ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("WindDirection", weather.Wind?.Deg ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("Visibility", weather.Visibility);
+
+        return command;
+
+        #endregion Private Methods
     }
 }
