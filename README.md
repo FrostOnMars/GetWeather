@@ -3,7 +3,7 @@
 Hello, world!
 
 PURPOSE OF THIS APP:
-This app is a practice application using C#, Api, and (Postgres) SQL to learn new skills and demonstrate what I can do for future employers. It searches the names of 5 hard-coded cities, finds the 5 closest matches, and returns weather conditions into a SQL database. Cities are hard-coded here for demonstration, but future extensibility may include ways to read input from a variety of sources (tables, user input, etc) and search by city name, lat/lon, and zip code. 
+This app is a practice application using C#, Api, and (Postgres) SQL to learn new skills and demonstrate what I can do for future employers. It searches the names of 5 hard-coded cities, finds the 5 closest matches for each, and returns weather conditions into a SQL database. Cities are hard-coded here for demonstration, but future extensibility may include ways to read input from a variety of sources (tables, user input, etc) and search by city name, lat/lon, and zip code. 
 
 I have added methods for converting units of measurement and translating weather data into user-friendly language. Examples of these conversions include:
   - converting wind speed degrees into directions on a compass
