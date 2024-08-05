@@ -5,15 +5,17 @@ namespace GetWeather.Models.FutureExtensibility;
 
 public class Weather
 {
-    [JsonProperty("id")]
-    public int Id { get; set; }
+    #region Public Properties
 
-    [JsonProperty("main"), CanBeNull]
-    public string Main { get; set; }
-
-    [JsonProperty("description"), CanBeNull]
+    [JsonProperty("description")]
+    [CanBeNull]
     public string Description { get; set; }
 
-    [JsonProperty("icon"), CanBeNull]
-    public string Icon { get; set; }
+    [JsonProperty("icon")][CanBeNull] public string Icon { get; set; }
+
+    [JsonProperty("id")] public int Id { get; set; }
+
+    [JsonProperty("main")][CanBeNull] public string Main { get; set; }
+
+    #endregion Public Properties
 }

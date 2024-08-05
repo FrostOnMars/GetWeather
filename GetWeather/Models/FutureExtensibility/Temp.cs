@@ -4,21 +4,19 @@ namespace GetWeather.Models.FutureExtensibility;
 
 public class Temp
 {
-    [JsonProperty("day")]
-    public float Day { get; set; }
+    #region Public Properties
 
-    [JsonProperty("min")]
-    public float Min { get; set; }
+    [JsonProperty("day")] public float Day { get; set; }
 
-    [JsonProperty("max")]
-    public float Max { get; set; }
+    [JsonProperty("eve")] public float Eve { get; set; }
 
-    [JsonProperty("night")]
-    public float Night { get; set; }
+    [JsonProperty("max")] public float Max { get; set; }
 
-    [JsonProperty("eve")]
-    public float Eve { get; set; }
+    [JsonProperty("min")] public float Min { get; set; }
 
-    [JsonProperty("morn")]
-    public float Morn { get; set; }
+    [JsonProperty("morn")] public float Morn { get; set; }
+
+    [JsonProperty("night")] public float Night { get; set; }
+
+    #endregion Public Properties
 }

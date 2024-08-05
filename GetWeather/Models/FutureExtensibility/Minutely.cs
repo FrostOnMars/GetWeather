@@ -4,9 +4,11 @@ namespace GetWeather.Models.FutureExtensibility;
 
 public class Minutely
 {
-    [JsonProperty("dt")]
-    public int Dt { get; set; }
+    #region Public Properties
 
-    [JsonProperty("precipitation")]
-    public int Precipitation { get; set; }
+    [JsonProperty("dt")] public int Dt { get; set; }
+
+    [JsonProperty("precipitation")] public int Precipitation { get; set; }
+
+    #endregion Public Properties
 }
