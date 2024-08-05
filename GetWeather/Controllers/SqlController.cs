@@ -1,6 +1,7 @@
 ﻿using GetWeather.Models;
 using GetWeather.Models.FutureExtensibility;
 using Npgsql;
+using NpgsqlTypes;
 
 namespace GetWeather.Controllers;
 
@@ -84,20 +85,20 @@ public class SqlController
     public static NpgsqlCommand CreateInsertWeatherCommand(CurrentWeather weather, NpgsqlConnection connection)
     {
         var command = new NpgsqlCommand(
-            "CALL insertweather(@city, @conditions, @weatherdate, @temperature, @feelslike, @clouds, @precipitation, @wind, @windspeed, @winddirection, @visibility)",
+            "CALL insert_weather_data(@city, @conditions, @weatherdate, @temperature, @feelslike, @clouds, @precipitation, @wind, @windspeed, @winddirection, @visibility)",
             connection);
 
-        command.Parameters.AddWithValue("city", weather.Name);
-        command.Parameters.AddWithValue("conditions", weather.Weather?.FirstOrDefault()?.Description ?? string.Empty);
-        command.Parameters.AddWithValue("weatherdate", ConvertToDateTime(weather.Dt));
-        command.Parameters.AddWithValue("temperature", weather.Main?.Temp);
-        command.Parameters.AddWithValue("feelslike", WeatherDescriber.DescribeFeelsLike(weather.Main.FeelsLike));
-        command.Parameters.AddWithValue("clouds", WeatherDescriber.ConvertCloudPercentToString(weather.Clouds));
-        command.Parameters.AddWithValue("precipitation", WeatherDescriber.AddPrecipitationText(weather.Rain) ?? string.Empty);
-        command.Parameters.AddWithValue("wind", WeatherDescriber.ConvertWindSpeedToBeaufortScale(weather.Wind));
-        command.Parameters.AddWithValue("windspeed", weather.Wind?.Speed ?? (object)DBNull.Value); //need method
-        command.Parameters.AddWithValue("winddirection", WeatherDescriber.ConvertDegreesToDirection((double)weather.Wind?.Deg)); //need method
-        command.Parameters.AddWithValue("visibility", weather.Visibility); //need method
+        command.Parameters.AddWithValue("@city", NpgsqlDbType.Varchar, weather.Name);
+        command.Parameters.AddWithValue("@conditions", NpgsqlDbType.Text, weather.Weather?.FirstOrDefault()?.Description ?? string.Empty);
+        command.Parameters.AddWithValue("@weatherdate", NpgsqlDbType.Timestamp, ConvertToDateTime(weather.Dt));
+        command.Parameters.AddWithValue("@temperature", NpgsqlDbType.Numeric, weather.Main?.Temp ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("@feelslike", NpgsqlDbType.Varchar, WeatherDescriber.DescribeFeelsLike(weather.Main.FeelsLike));
+        command.Parameters.AddWithValue("@clouds", NpgsqlDbType.Varchar, WeatherDescriber.ConvertCloudPercentToString(weather.Clouds));
+        command.Parameters.AddWithValue("@precipitation", NpgsqlDbType.Varchar, WeatherDescriber.AddPrecipitationText(weather.Rain) ?? string.Empty);
+        command.Parameters.AddWithValue("@wind", NpgsqlDbType.Varchar, WeatherDescriber.ConvertWindSpeedToBeaufortScale(weather.Wind));
+        command.Parameters.AddWithValue("@windspeed", NpgsqlDbType.Numeric, weather.Wind?.Speed ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("@winddirection", NpgsqlDbType.Varchar, WeatherDescriber.ConvertDegreesToDirection((double)weather.Wind?.Deg));
+        command.Parameters.AddWithValue("@visibility", NpgsqlDbType.Integer, weather.Visibility);
 
         return command;
     }
